@@ -4,7 +4,7 @@ The exciting surf themed sequel to [SpaceDodge](https://github.com/Resonance1584
 
 A Javascript / Canvas game with no dependencies on any external libraries.
 
-WIP - (play the incomplete quest here)[https://res.nz/spacedodge2bali.htm]
+WIP - [play the incomplete quest here](https://res.nz/spacedodge2bali.html)
 
 ## Controls
 
