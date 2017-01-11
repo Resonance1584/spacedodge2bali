@@ -909,8 +909,7 @@ var islandDialogue = function () {
 	if (startDelta > 500) {
 		if (keys[13]) {
 			// If Enter pressed advance to next stage
-			startTime = time;
-			gameMode = 5;
+			goToIslandMonkeys();
 		} else if (keys[38]) {
 			// If Up pressed skip to next dialogue
 			nextIslandDialogueTime = time;
@@ -927,14 +926,413 @@ var islandDialogue = function () {
 
 	// Advance to next stage
 	if (!dialogue[nextIslandDialogue]) {
-		startTime = time;
-		gameMode = 5;
+		goToIslandMonkeys();
 	}
+}
+
+var monkeysCamera = {
+	x: 0,
+	marginLeft: 20,
+	marginRight: 40
+}
+
+var monkeysPlayer = {
+	x: 10,
+	y: 30,
+	initialY: 30,
+	velocityY: 0,
+	width: 7,
+	stillSprite: [
+		                              [2,0,'fbd230'],[3,0,'fbd230'],[4,0,'fbd230'],
+		                              [2,1,'ffd5aa'],[3,1,'ffd5aa'],[4,1,'ffd5aa'],
+		               [1,2,'ffffff'],[2,2,'ffffff'],[3,2,'ffffff'],[4,2,'ffffff'],[5,2,'ffffff'],
+		               [1,3,'ffd5aa'],[2,3,'ffffff'],[3,3,'ffffff'],[4,3,'ffffff'],[5,3,'ffd5aa'],
+		                              [2,4,'00cc22'],[3,4,'00cc22'],[4,4,'00cc22'],
+		                              [2,5,'ffd5aa'],               [4,5,'ffd5aa'],
+		                              [2,6,'ffd5aa'],               [4,6,'ffd5aa']
+	],
+	leftSpriteA: [
+		                              [2,0,'fbd230'],[3,0,'fbd230'],[4,0,'fbd230'],
+		                              [2,1,'ffd5aa'],[3,1,'ffd5aa'],[4,1,'fbd230'],
+		               [1,2,'ffffff'],[2,2,'ffffff'],[3,2,'ffffff'],[4,2,'ffffff'],[5,2,'ffffff'],
+		               [1,3,'ffd5aa'],[2,3,'ffffff'],[3,3,'ffffff'],[4,3,'ffffff'],[5,3,'ffd5aa'],
+		                              [2,4,'00cc22'],[3,4,'00cc22'],[4,4,'00cc22'],
+		                              [2,5,'ffd5aa'],               [4,5,'ffd5aa'],
+		                                                            [4,6,'ffd5aa']
+	],
+	leftSpriteB: [
+		                              [2,0,'fbd230'],[3,0,'fbd230'],[4,0,'fbd230'],
+		                              [2,1,'ffd5aa'],[3,1,'ffd5aa'],[4,1,'fbd230'],
+		               [1,2,'ffffff'],[2,2,'ffffff'],[3,2,'ffffff'],[4,2,'ffffff'],[5,2,'ffffff'],
+		               [1,3,'ffd5aa'],[2,3,'ffffff'],[3,3,'ffffff'],[4,3,'ffffff'],[5,3,'ffd5aa'],
+		                              [2,4,'00cc22'],[3,4,'00cc22'],[4,4,'00cc22'],
+		                              [2,5,'ffd5aa'],               [4,5,'ffd5aa'],
+		                              [2,6,'ffd5aa']
+	],
+	rightSpriteA: [
+		                              [2,0,'fbd230'],[3,0,'fbd230'],[4,0,'fbd230'],
+		                              [2,1,'fbd230'],[3,1,'ffd5aa'],[4,1,'ffd5aa'],
+		               [1,2,'ffffff'],[2,2,'ffffff'],[3,2,'ffffff'],[4,2,'ffffff'],[5,2,'ffffff'],
+		               [1,3,'ffd5aa'],[2,3,'ffffff'],[3,3,'ffffff'],[4,3,'ffffff'],[5,3,'ffd5aa'],
+		                              [2,4,'00cc22'],[3,4,'00cc22'],[4,4,'00cc22'],
+		                              [2,5,'ffd5aa'],               [4,5,'ffd5aa'],
+		                              [2,6,'ffd5aa']
+	],
+	rightSpriteB: [
+		                              [2,0,'fbd230'],[3,0,'fbd230'],[4,0,'fbd230'],
+		                              [2,1,'fbd230'],[3,1,'ffd5aa'],[4,1,'ffd5aa'],
+		               [1,2,'ffffff'],[2,2,'ffffff'],[3,2,'ffffff'],[4,2,'ffffff'],[5,2,'ffffff'],
+		               [1,3,'ffd5aa'],[2,3,'ffffff'],[3,3,'ffffff'],[4,3,'ffffff'],[5,3,'ffd5aa'],
+		                              [2,4,'00cc22'],[3,4,'00cc22'],[4,4,'00cc22'],
+		                              [2,5,'ffd5aa'],               [4,5,'ffd5aa'],
+		                                                            [4,6,'ffd5aa']
+	]
+}
+
+var cloudA = {
+	width: 8,
+	sprite: [
+		                              [2,0,'ffffff'],                                             [6,0,'ffffff'],
+		               [1,1,'ffffff'],[2,1,'ffffff'],[3,1,'ffffff'],               [5,1,'ffffff'],[6,1,'ffffff'],[7,1,'ffffff'],
+		[0,2,'ffffff'],[1,2,'ffffff'],[2,2,'ffffff'],[3,2,'ffffff'],[4,2,'ffffff'],[5,2,'ffffff'],[6,2,'ffffff'],[7,2,'ffffff'],
+		[0,3,'ffffff'],[1,3,'ffffff'],[2,3,'ffffff'],[3,3,'ffffff'],[4,3,'ffffff'],[5,3,'ffffff'],[6,3,'ffffff'],[7,3,'ffffff'],
+		               [1,4,'ffffff'],[2,4,'ffffff'],               [4,4,'ffffff'],[5,4,'ffffff'],[6,4,'ffffff']
+	]
+};
+
+var cloudB = {
+	width: 4,
+	sprite: [
+		               [1,0,'ffffff'],[2,0,'ffffff'],
+		[0,1,'ffffff'],[1,1,'ffffff'],[2,1,'ffffff'],[3,1,'ffffff'],
+		               [1,2,'ffffff'],[2,2,'ffffff']
+	]
+};
+
+var cloudC = {
+	width: 8,
+	sprite: [
+		               [1,0,'ffffff'],[2,0,'ffffff'],[3,0,'ffffff'],               [5,0,'ffffff'],[6,0,'ffffff'],
+		[0,1,'ffffff'],[1,1,'ffffff'],[2,1,'ffffff'],[3,1,'ffffff'],[4,1,'ffffff'],[5,1,'ffffff'],[6,1,'ffffff'],[7,1,'ffffff'],
+		               [1,2,'ffffff'],[2,2,'ffffff'],[3,2,'ffffff'],               [5,2,'ffffff'],[6,2,'ffffff']
+	]
+};
+var monkeyBrown = '721414';
+var monkeyA = {
+	width: 6,
+	sprite: [
+		                [1,0,monkeyBrown],[2,0,monkeyBrown],[3,0,monkeyBrown],             [5,0,monkeyBrown],
+		                [1,1,'000000'],[2,1,monkeyBrown],[3,1,'000000'],               [5,1,monkeyBrown],
+		[0,2,monkeyBrown],[1,2,'ffffff'],[2,2,'ffffff'],[3,2,'ffffff'],[4,2,monkeyBrown],
+		[0,3,monkeyBrown],[1,3,monkeyBrown],[2,3,monkeyBrown],[3,3,monkeyBrown],[4,3,monkeyBrown],
+		                [1,4,monkeyBrown],                [3,4,monkeyBrown]
+	]
+}
+
+var monkeyB = {
+	width: 7,
+	leftSprite: [
+		                  [1,0,monkeyBrown],[2,0,monkeyBrown],
+		                  [1,1,'000000'],[2,1,monkeyBrown],[3,1,monkeyBrown],            [5,1,monkeyBrown],
+		                  [1,2,'ffffff'],[2,2,monkeyBrown],[3,2,monkeyBrown],            [5,2,monkeyBrown],
+		                  [1,3,monkeyBrown],[2,3,monkeyBrown],[3,3,monkeyBrown],[4,3,monkeyBrown],
+		[0,4,monkeyBrown],[1,4,monkeyBrown],                  [3,4,monkeyBrown]
+	],
+	rightSprite: [
+		                  [4,0,monkeyBrown],[3,0,monkeyBrown],
+		                  [4,1,'000000'],[3,1,monkeyBrown],[2,1,monkeyBrown],            [0,1,monkeyBrown],
+		                  [4,2,'ffffff'],[3,2,monkeyBrown],[2,2,monkeyBrown],            [0,2,monkeyBrown],
+		                  [4,3,monkeyBrown],[3,3,monkeyBrown],[2,3,monkeyBrown],[1,3,monkeyBrown],
+		[5,4,monkeyBrown],[4,4,monkeyBrown],                  [2,4,monkeyBrown]
+	]
+}
+
+var monkeys = [];
+
+var spawnJumpMonkey = function (x, y, secondsBetweenJumps) {
+	return {
+		x: x,
+		y: y,
+		initialY: y,
+		velocityY: 0,
+		width: monkeyA.width,
+		getSprite: function () {
+			return monkeyA.sprite
+		},
+		nextJumpTime: time + Math.random() * secondsBetweenJumps * 1000,
+		jumpInterval: secondsBetweenJumps * 1000,
+		tick: function () {
+			if (this.y >= this.initialY) {
+				if (time >= this.nextJumpTime) {
+					this.nextJumpTime = time + this.jumpInterval;
+					this.velocityY = 150;
+				}
+				this.velocityY = Math.max(0, this.velocityY);
+			} else {
+				this.velocityY = this.velocityY - (frameDelta / 1000) * 400;
+			}
+
+			this.y = Math.min(this.initialY, Math.floor(this.y - (this.velocityY * (frameDelta / 1000))));
+		}
+	};
+};
+
+var spawnRunMonkey = function (x, y, runDistance, secondsBetweenMoves) {
+	return {
+		x: x,
+		y: y,
+		minX: x,
+		maxX: x + runDistance,
+		facingLeft: false,
+		width: monkeyB.width,
+		getSprite: function () {
+			return this.facingLeft ? monkeyB.leftSprite : monkeyB.rightSprite
+		},
+		nextMoveTime: time + Math.random() * secondsBetweenMoves * 1000,
+		moveInterval: secondsBetweenMoves * 1000,
+		tick: function () {
+			if (time >= this.nextMoveTime) {
+				this.nextMoveTime = time + this.moveInterval;
+				if (this.facingLeft) {
+					this.x = this.x - 1;
+				} else {
+					this.x = this.x + 1;
+				}
+
+				if (this.x >= this.maxX) {
+					this.facingLeft = true;
+				} else if (this.x <= this.minX) {
+					this.facingLeft = false;
+				}
+			}
+		}
+	};
+};
+
+var goToIslandMonkeys = function () {
+	// Reset game state
+	startTime = time;
+	gameMode = 5;
+	monkeysCamera.x = 0;
+	monkeysPlayer.x = 10;
+	monkeysPlayer.y = 30;
+	monkeys = [];
+
+	// Plants and bushes
+	monkeysBackground = [
+	{
+		x: 30,
+		y: 25,
+		width: 8,
+		sprite: palmTree
+	},
+	{
+		x: 50,
+		y: 33,
+		width: 8,
+		sprite: palmTree
+	},
+	{
+		x: 110,
+		y: 33,
+		width: 8,
+		sprite: palmTree
+	},
+	{
+		x: 171,
+		y: 25,
+		width: 8,
+		sprite: palmTree
+	},
+	{
+		x: 180,
+		y: 25,
+		width: 8,
+		sprite: palmTree
+	},
+	{
+		x: 250,
+		y: 25,
+		width: 8,
+		sprite: palmTree
+	},
+	{
+		x: 370,
+		y: 25,
+		width: 8,
+		sprite: palmTree
+	},
+	{
+		x: 380,
+		y: 25,
+		width: 8,
+		sprite: palmTree
+	},
+	{
+		x: 384,
+		y: 25,
+		width: 8,
+		sprite: palmTree
+	},
+	{
+		x: 450,
+		y: 33,
+		width: 8,
+		sprite: palmTree
+	}];
+
+	// Dynamic Weather
+	var numClouds = frameRandom * 20;
+	for (var i = 0; i < numClouds; i++) {
+		var cloud = {
+			x: Math.floor(Math.random() * monkeysStageWidth),
+			y: Math.floor(Math.random() * 15)
+		};
+		switch (Math.floor(Math.random() * 3)) {
+			case 0:
+				cloud.width = cloudA.width;
+				cloud.sprite = cloudA.sprite;
+				break;
+			case 1:
+				cloud.width = cloudB.width;
+				cloud.sprite = cloudB.sprite;
+				break;
+			case 2:
+			default:
+				cloud.width = cloudC.width;
+				cloud.sprite = cloudC.sprite;
+				break;
+		}
+		monkeysBackground.push(cloud)
+	}
+
+	// Enemies
+	monkeys.push(spawnRunMonkey(60, 32, 5, 0.2));
+	monkeys.push(spawnRunMonkey(110, 32, 100, 0.05));
+	monkeys.push(spawnRunMonkey(240, 32, 30, 0.1));
+	monkeys.push(spawnRunMonkey(240, 32, 20, 0.05));
+	monkeys.push(spawnJumpMonkey(120, 32, 2));
+	monkeys.push(spawnJumpMonkey(180, 32, 1));
 }
 
 // --- Island Monkey Game Mode
 
+var nextMoveTime = time;
+var monkeysStageWidth = 500;
+var monkeysBackground = [
+	{
+		x: 30,
+		y: 25,
+		width: 8,
+		sprite: palmTree
+	},
+	{
+		x: 171,
+		y: 25,
+		width: 8,
+		sprite: palmTree
+	},
+	{
+		x: 180,
+		y: 25,
+		width: 8,
+		sprite: palmTree
+	}
+]
 var islandMonkeys = function () {
+	// Get player input
+	var direction = 0;
+	if (keys[37] && keys[39]) {
+		// no-op
+	} else if (keys[37]) {
+		// Move left
+		direction = -1;
+	} else if (keys[39]) {
+		// Move right
+		direction = 1;
+	}
+
+	if (monkeysPlayer.y >= monkeysPlayer.initialY) {
+		if (keys[38]) {
+		// Jump if on ground
+			monkeysPlayer.velocityY = 150;
+		}
+		// Stop down motion if already on ground
+		monkeysPlayer.velocityY = Math.max(0, monkeysPlayer.velocityY);
+  } else {
+		monkeysPlayer.velocityY = monkeysPlayer.velocityY - (frameDelta / 1000) * 500;
+	}
+
+	if (nextMoveTime <= time) {
+		nextMoveTime = time + 40;
+		monkeysPlayer.x = Math.min(Math.max(monkeysPlayer.x + direction, 0), monkeysStageWidth - monkeysPlayer.width);
+		if (monkeysPlayer.x < (monkeysCamera.x + monkeysCamera.marginLeft)) {
+			monkeysCamera.x = Math.max(monkeysCamera.x - 1, 0);
+		} else if (monkeysPlayer.x + 6 > (monkeysCamera.x + width - monkeysCamera.marginRight)) {
+			monkeysCamera.x = Math.min(monkeysStageWidth - width, monkeysCamera.x + 1);
+		}
+		if (monkeysPlayer.velocityY !== 0) {
+			monkeysPlayer.y = Math.min(monkeysPlayer.initialY, Math.floor(monkeysPlayer.y - (monkeysPlayer.velocityY * (frameDelta / 1000))));
+		}
+	}
+
+	// Update world state
+	for (var i = 0; i < monkeys.length; i++) {
+		monkeys[i].tick();
+	}
+
+	if (monkeysPlayer.x >= monkeysStageWidth - monkeysPlayer.width) {
+		// To Be Continued
+		gameMode = 6;
+	}
+	// Render world
+
+	// Draw background objects
+	for (var i = 0; i < monkeysBackground.length; i++) {
+		if (monkeysBackground[i].x + monkeysBackground[i].width > monkeysCamera.x && monkeysBackground[i].x < monkeysCamera.x + width) {
+			drawSprite(monkeysBackground[i].x - monkeysCamera.x, monkeysBackground[i].y, monkeysBackground[i].sprite);
+		}
+	}
+
+	// Draw ground
+	for (var i = 0; i < width; i++) {
+		for(var j = 37; j < height; j++) {
+			drawPixel(i, j, sandGold);
+		}
+	}
+
+	// Draw monkeys
+	for (var i = 0; i < monkeys.length; i++) {
+		if (monkeys[i].x + monkeys[i].width > monkeysCamera.x && monkeys[i].x < monkeysCamera.x + width) {
+			drawSprite(monkeys[i].x - monkeysCamera.x, monkeys[i].y, monkeys[i].getSprite());
+		}
+	}
+
+	// Draw player
+	switch(direction) {
+		case -1:
+			if (Math.floor(time / 100) % 2 === 0) {
+				drawSprite(monkeysPlayer.x - monkeysCamera.x, monkeysPlayer.y, monkeysPlayer.leftSpriteA);
+			} else {
+				drawSprite(monkeysPlayer.x - monkeysCamera.x, monkeysPlayer.y, monkeysPlayer.leftSpriteB);
+			}
+			break;
+		case 1:
+			if (Math.floor(time / 100) % 2 === 0) {
+				drawSprite(monkeysPlayer.x - monkeysCamera.x, monkeysPlayer.y, monkeysPlayer.rightSpriteA);
+			} else {
+				drawSprite(monkeysPlayer.x - monkeysCamera.x, monkeysPlayer.y, monkeysPlayer.rightSpriteB);
+			}
+			break;
+		case 0:
+		default:
+			drawSprite(monkeysPlayer.x - monkeysCamera.x, monkeysPlayer.y, monkeysPlayer.stillSprite);
+			break;
+	}
+}
+
+// --- To be continued screen for WIP stages
+var toBeContinued = function () {
 	var colors = [sandGold, seaGreen, waterBlue, hotPink];
 	var k = 0;
 	for (var i = 2; i < width - 2; i += 8) {
@@ -1015,6 +1413,9 @@ var gameLoop = function () {
 				break;
 			case 5:
 				islandMonkeys();
+				break;
+			case 6:
+				toBeContinued();
 				break;
 			default:
 				endGame();
