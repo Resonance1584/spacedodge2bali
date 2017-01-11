@@ -8,6 +8,8 @@ body, html {
 	margin: 0;
 	padding: 0;
 	background: linear-gradient(#76f5fb, #fb3494);
+	background-repeat: no-repeat;
+	background-attachment: fixed;
 	color: #fbd230;
 	font-family: sans-serif;
 }
@@ -20,6 +22,10 @@ h1 {
 }
 h1.title {
 	text-shadow: 5px 2px 10px black;
+}
+h2 {
+	margin: 10px;
+	padding: 0;
 }
 div.container {
 	margin-left: auto;
@@ -44,6 +50,20 @@ p {
 			<p>After escaping from the totally <em>not chill</em> <strong>Space Dot Dudes</strong>, our <strong>Rad Hero Dude</strong> made his way safely back to <strong>Earth</strong>. After debriefing with the government dudes he headed straight to <strong>Bali</strong> to finally catch up with some other <strong>Rad Dudes</strong>, check out those <em>Killer Breaks</em>, and <em>Hang Ten</em>.<p>
 			<p>The <em>Stoke</em> was high, dude, as were the waves, and finally life was totally <em>Chill</em>. But little did <strong>Hero Dude</strong> know things in <strong>Bali</strong> were about to get totally <em>Gnarly</em>.</p>
 			<p><em>"Cowabunga, Dude!"</em><p>
+			<h2>Controls</h2>
+			<p><strong>Requires Keyboard</strong></p>
+			<p>
+				<ul>
+					<li>[ <strong>&uarr;</strong> ] Jump when surfing or on land. Advance dialogue.
+					</li>
+					<li>[ <strong>&larr;</strong> ] [ <strong>&rarr;</strong> ] Move left and right when on land.
+					</li>
+					<li>[ <strong>Enter</strong> ] Start Game. Skip dialogue.
+					</li>
+					<li>[ <strong>Esc</strong> ] Restart Game.
+					</li>
+				</ul>
+			</p>
 		</div>
 		<script>
 'use strict';
@@ -96,11 +116,11 @@ var origFillStyle = ctx.fillStyle;
 var drawPixel = function (x, y, color) {
 	origFillStyle = ctx.fillStyle;
 	ctx.fillStyle = '#' + color;
-	x = x * 8
-	y = y * 8
+	x = x * 8;
+	y = y * 8;
 	ctx.fillRect(x, y, 8, 8);
 	ctx.fillStyle = origFillStyle;
-}
+};
 
 // Defines the shapes of letters in alphabet as 3x5 pixels
 var pixelChars = {
@@ -376,7 +396,7 @@ var drawText = function (x, y, text, color) {
 	var char = '';
 	for (var i = 0; i < chars.length; i++) {
 		if (chars[i].trim() !== '') {
-			char = pixelChars[chars[i].toLowerCase()] || pixelChars['?']
+			char = pixelChars[chars[i].toLowerCase()] || pixelChars['?'];
 			for (var j = 0; j < char.length; j++) {
 				drawPixel(
 					x + char[j][0],
@@ -387,7 +407,7 @@ var drawText = function (x, y, text, color) {
 		}
 		x += 4;
 	}
-}
+};
 
 // Pixel map for wave shape
 var wave = [
@@ -399,7 +419,7 @@ var wave = [
 	[true,  true,  true,  true,  true,  true,  true,  true] ,
 	[true,  true,  true,  true,  true,  true,  true,  true] ,
 	[true,  true,  true,  true,  true,  true,  true,  true]
-]
+];
 
 // Draws a wave with given offset - modify offset to loop wave animation
 var drawWave = function (x, y, offset, color) {
@@ -407,31 +427,32 @@ var drawWave = function (x, y, offset, color) {
 		for (var j = 0; j < 8; j++) {
 			var k = (i + offset) % 8;
 			if (wave[j][k]) {
-				drawPixel(x + i, y + j, color)
+				drawPixel(x + i, y + j, color);
 			}
 		}
 	}
-}
+};
 
+var konami = false;
 // Starts the game
 var startGame = function () {
 	startTime = time;
-	gameMode = 1;
+	gameMode = konami ? 4 : 1;
 	keys = {};
-}
+};
 
 // Ends the game
 var endGame = function () {
 	konami = false;
 	deadTime = time;
 	gameMode = 0;
-}
+};
 
 // Shows death (game over) screen
 var goToKillScreen = function () {
 	deadTime = time;
 	gameMode = 3;
-}
+};
 
 // --- Countdown animation game mode
 var getReady = function () {
@@ -452,13 +473,13 @@ var getReady = function () {
 
 	var offset = Math.floor(time / 250) % 8;
 	for (var i = 0; i < width; i += 8) {
-		drawWave(i, height - 8, offset, 'cef3fd')
+		drawWave(i, height - 8, offset, 'cef3fd');
 	}
-}
+};
 
 // --- Jump shark game mode
 
-var jumpGamePlayer = {}
+var jumpGamePlayer = {};
 var spawnJumpGamePlayer = function () {
 	return {
 		x: 10,
@@ -480,7 +501,7 @@ var spawnJumpGamePlayer = function () {
 		],
 		// Move and return collision hull
 		tick : function() {
-			var newY = this.y
+			var newY = this.y;
 
 			if (this.y >= this.initialY) {
 				if (keys[38]) {
@@ -513,7 +534,7 @@ var spawnJumpGamePlayer = function () {
 			drawSprite(this.x, this.y, this.sprite);
 		}
 	};
-}
+};
 
 var spawnJumpGameShark = function () {
 	return {
@@ -557,7 +578,7 @@ var spawnJumpGameShark = function () {
 			}
 		}
 	};
-}
+};
 
 
 
@@ -580,11 +601,11 @@ var drawSprite = function (x, y, sprite) {
 	for (var i = 0; i < sprite.length; i++) {
 		drawPixel(sprite[i][0] + x, sprite[i][1] + y, sprite[i][2]);
 	}
-}
+};
 
 var drawPalmTree = function (x, y) {
 	drawSprite(x, y, palmTree);
-}
+};
 
 var drawIsland = function (x, y) {
 	for (var i = x; i < width; i++) {
@@ -610,7 +631,7 @@ var drawIsland = function (x, y) {
 	if (width - x > 40) {
 		drawPalmTree(x + 40, y - 14);
 	}
-}
+};
 
 var surfWave = [
 	[8,0,seaFoam],[9,0,seaFoam],
@@ -629,7 +650,7 @@ var jumpGameSharks = [];
 var nextSharkTime = 0;
 var jumpGame = function () {
 	// Distance to shore
-	var distance = 1800 - Math.floor(startDelta / 40)
+	var distance = 1800 - Math.floor(startDelta / 40);
 
 	if (!jumpGamePlayer.tick) {
 		jumpGamePlayer = spawnJumpGamePlayer();
@@ -649,11 +670,11 @@ var jumpGame = function () {
 	}
 	if (distance < 600) {
 		var islandOffset = Math.floor(60 / Math.max((distance / 60), 1));
-		drawIsland(width - islandOffset, 28)
+		drawIsland(width - islandOffset, 28);
 	}
 
 	for (var i = 12; i < width; i++) {
-		drawPixel(i, 29, '58a3d5')
+		drawPixel(i, 29, '58a3d5');
 	}
 
 	jumpGamePlayer.draw();
@@ -695,24 +716,24 @@ var jumpGame = function () {
 
 	for (var i = 0; i < width; i++) {
 		for (var m = 30; m < height; m++) {
-			drawPixel(i,m,'3b9b9c')
+			drawPixel(i,m,'3b9b9c');
 		}
 	}
 
 	var m = Math.floor(time / (distance > 0 ? 10 : 40)) % 8;
 	for (var i = 0; i < width; i += 8) {
-		drawWave(i, height - 8, m, 'cef3fd')
+		drawWave(i, height - 8, m, 'cef3fd');
 	}
 
 	if (distance > 0) {
 		var distanceText = distance / 1000 >= 1 ? (distance / 1000).toString().substr(0, 3) + 'KM' : distance + 'M';
-		drawText(54, 4, 'SHORE:' + distanceText, '78c29e')
+		drawText(54, 4, 'SHORE:' + distanceText, '78c29e');
 	}
 
 	if (distance < -100) {
 		goToIslandDialogue();
 	}
-}
+};
 
 // --- Kill Screen (Game Over Dude!)
 
@@ -731,7 +752,7 @@ var drawSkull = function (x, y, color) {
 		}
 		draw = !draw;
 	}
-}
+};
 
 var killScreen = function () {
 
@@ -743,7 +764,7 @@ var killScreen = function () {
 	drawPalmTree(88, 15);
 
 	for (var i = 1; i < 5; i++) {
-		drawSkull(Math.floor(width * (i / 5)) - 3, 24, hotPink)
+		drawSkull(Math.floor(width * (i / 5)) - 3, 24, hotPink);
 	}
 
 	deadDelta = time - deadTime;
@@ -753,7 +774,7 @@ var killScreen = function () {
 	if (time - deadTime > 10000 || keys[27] || keys[13]) {
 		endGame();
 	}
-}
+};
 
 // --- Island Dialogue
 
@@ -765,7 +786,7 @@ var drawFrameRight = function () {
 	for (var i = 23; i < 99; i++) {
 		drawPixel(i, 35, '000000');
 	}
-}
+};
 
 var drawFrameLeft = function () {
 	drawPixel(74, 7, '000000');
@@ -775,7 +796,7 @@ var drawFrameLeft = function () {
 	for (var i = 1; i < 76; i++) {
 		drawPixel(i, 35, '000000');
 	}
-}
+};
 
 var rastaBroFace = [
 	[5,0,palmBrown],[6,0,palmBrown],[7,0,palmBrown],
@@ -898,13 +919,13 @@ var dialogue = [
 		drawFrameLeft();
 		drawSprite(84, 13, heroDudeFace);
 	})
-]
+];
 var goToIslandDialogue = function () {
 	startTime = time;
 	nextIslandDialogue = 0;
 	nextIslandDialogueTime = time + 5000;
 	gameMode = 4;
-}
+};
 var islandDialogue = function () {
 	if (startDelta > 500) {
 		if (keys[13]) {
@@ -928,20 +949,23 @@ var islandDialogue = function () {
 	if (!dialogue[nextIslandDialogue]) {
 		goToIslandMonkeys();
 	}
-}
+};
 
 var monkeysCamera = {
 	x: 0,
 	marginLeft: 20,
 	marginRight: 40
-}
+};
 
 var monkeysPlayer = {
+	health: 6,
 	x: 10,
 	y: 30,
 	initialY: 30,
 	velocityY: 0,
+	direction: 0,
 	width: 7,
+	nextMoveTime: time,
 	stillSprite: [
 		                              [2,0,'fbd230'],[3,0,'fbd230'],[4,0,'fbd230'],
 		                              [2,1,'ffd5aa'],[3,1,'ffd5aa'],[4,1,'ffd5aa'],
@@ -986,8 +1010,61 @@ var monkeysPlayer = {
 		                              [2,4,'00cc22'],[3,4,'00cc22'],[4,4,'00cc22'],
 		                              [2,5,'ffd5aa'],               [4,5,'ffd5aa'],
 		                                                            [4,6,'ffd5aa']
-	]
-}
+	],
+	tick: function () {
+		// Get player input
+		this.direction = 0;
+		if (keys[37] && keys[39]) {
+			// no-op
+		} else if (keys[37]) {
+			// Move left
+			this.direction = -1;
+		} else if (keys[39]) {
+			// Move right
+			this.direction = 1;
+		}
+
+		if (monkeysPlayer.y >= monkeysPlayer.initialY) {
+			if (keys[38]) {
+			// Jump if on ground
+				monkeysPlayer.velocityY = 150;
+			}
+			// Stop down motion if already on ground
+			monkeysPlayer.velocityY = Math.max(0, monkeysPlayer.velocityY);
+	  } else {
+			monkeysPlayer.velocityY = monkeysPlayer.velocityY - (frameDelta / 1000) * 500;
+		}
+
+		if (this.nextMoveTime <= time) {
+			this.nextMoveTime = time + 40;
+			monkeysPlayer.x = Math.min(Math.max(monkeysPlayer.x + this.direction, 0), monkeysStageWidth - monkeysPlayer.width);
+			console.log(monkeysPlayer.x);
+			if (monkeysPlayer.velocityY !== 0) {
+				monkeysPlayer.y = Math.min(monkeysPlayer.initialY, Math.floor(monkeysPlayer.y - (monkeysPlayer.velocityY * (frameDelta / 1000))));
+			}
+		}
+	},
+	getSprite: function () {
+		switch(this.direction) {
+			case -1:
+				if (Math.floor(time / 100) % 2 === 0) {
+					return this.leftSpriteA;
+				} else {
+					return this.leftSpriteB;
+				}
+				break;
+			case 1:
+				if (Math.floor(time / 100) % 2 === 0) {
+					return this.rightSpriteA;
+				} else {
+					return this.rightSpriteB;
+				}
+				break;
+			default:
+				return this.stillSprite;
+		}
+	}
+};
 
 var cloudA = {
 	width: 8,
@@ -1027,7 +1104,7 @@ var monkeyA = {
 		[0,3,monkeyBrown],[1,3,monkeyBrown],[2,3,monkeyBrown],[3,3,monkeyBrown],[4,3,monkeyBrown],
 		                [1,4,monkeyBrown],                [3,4,monkeyBrown]
 	]
-}
+};
 
 var monkeyB = {
 	width: 7,
@@ -1045,7 +1122,41 @@ var monkeyB = {
 		                  [4,3,monkeyBrown],[3,3,monkeyBrown],[2,3,monkeyBrown],[1,3,monkeyBrown],
 		[5,4,monkeyBrown],[4,4,monkeyBrown],                  [2,4,monkeyBrown]
 	]
-}
+};
+
+var heartFull = [
+	               [1,0,'000000'],               [3,0,'000000'],
+	[0,1,'000000'],[1,1,'ff0000'],[2,1,'000000'],[3,1,'ff0000'],[4,1,'000000'],
+	[0,2,'000000'],[1,2,'ff0000'],[2,2,'ff0000'],[3,2,'ff0000'],[4,2,'000000'],
+	               [1,3,'000000'],[2,3,'ff0000'],[3,3,'000000'],
+	                              [2,4,'000000']
+];
+
+var heartHalf = [
+	               [1,0,'000000'],               [3,0,'000000'],
+	[0,1,'000000'],[1,1,'ff0000'],[2,1,'000000'],[3,1,'ffffff'],[4,1,'000000'],
+	[0,2,'000000'],[1,2,'ff0000'],[2,2,'ffffff'],[3,2,'ffffff'],[4,2,'000000'],
+	               [1,3,'000000'],[2,3,'ffffff'],[3,3,'000000'],
+	                              [2,4,'000000']
+];
+
+var heartEmpty = [
+	               [1,0,'000000'],               [3,0,'000000'],
+	[0,1,'000000'],[1,1,'ffffff'],[2,1,'000000'],[3,1,'ffffff'],[4,1,'000000'],
+	[0,2,'000000'],[1,2,'ffffff'],[2,2,'ffffff'],[3,2,'ffffff'],[4,2,'000000'],
+	               [1,3,'000000'],[2,3,'ffffff'],[3,3,'000000'],
+	                              [2,4,'000000']
+];
+
+var boardBackground = [
+	               [1,0,'000000'],
+	[0,1,'000000'],[1,1,hotPink],[2,1,'000000'],
+	[0,2,'000000'],[1,2,hotPink],[2,2,'000000'],
+	[0,3,'000000'],[1,3,hotPink],[2,3,'000000'],
+	[0,4,'000000'],[1,4,hotPink],[2,4,'000000'],
+	[0,5,'000000'],[1,5,hotPink],[2,5,'000000'],
+	[0,6,'000000'],[1,6,hotPink],[2,6,'000000'],
+];
 
 var monkeys = [];
 
@@ -1057,7 +1168,7 @@ var spawnJumpMonkey = function (x, y, secondsBetweenJumps) {
 		velocityY: 0,
 		width: monkeyA.width,
 		getSprite: function () {
-			return monkeyA.sprite
+			return monkeyA.sprite;
 		},
 		nextJumpTime: time + Math.random() * secondsBetweenJumps * 1000,
 		jumpInterval: secondsBetweenJumps * 1000,
@@ -1086,7 +1197,7 @@ var spawnRunMonkey = function (x, y, runDistance, secondsBetweenMoves) {
 		facingLeft: false,
 		width: monkeyB.width,
 		getSprite: function () {
-			return this.facingLeft ? monkeyB.leftSprite : monkeyB.rightSprite
+			return this.facingLeft ? monkeyB.leftSprite : monkeyB.rightSprite;
 		},
 		nextMoveTime: time + Math.random() * secondsBetweenMoves * 1000,
 		moveInterval: secondsBetweenMoves * 1000,
@@ -1109,6 +1220,8 @@ var spawnRunMonkey = function (x, y, runDistance, secondsBetweenMoves) {
 	};
 };
 
+var monkeysBackground = [];
+var monkeysStageWidth = 500;
 var goToIslandMonkeys = function () {
 	// Reset game state
 	startTime = time;
@@ -1116,10 +1229,29 @@ var goToIslandMonkeys = function () {
 	monkeysCamera.x = 0;
 	monkeysPlayer.x = 10;
 	monkeysPlayer.y = 30;
+	monkeysPlayer.health = 6;
 	monkeys = [];
 
 	// Plants and bushes
 	monkeysBackground = [
+	{
+		x: 6,
+		y: 30,
+		width: 3,
+		sprite: boardBackground
+	},
+	{
+		x: -3,
+		y: 33,
+		width: 12,
+		sprite: surfWave
+	},
+	{
+		x: -4,
+		y: 30,
+		width: 12,
+		sprite: surfWave
+	},
 	{
 		x: 30,
 		y: 25,
@@ -1197,13 +1329,12 @@ var goToIslandMonkeys = function () {
 				cloud.width = cloudB.width;
 				cloud.sprite = cloudB.sprite;
 				break;
-			case 2:
 			default:
 				cloud.width = cloudC.width;
 				cloud.sprite = cloudC.sprite;
 				break;
 		}
-		monkeysBackground.push(cloud)
+		monkeysBackground.push(cloud);
 	}
 
 	// Enemies
@@ -1211,80 +1342,69 @@ var goToIslandMonkeys = function () {
 	monkeys.push(spawnRunMonkey(110, 32, 100, 0.05));
 	monkeys.push(spawnRunMonkey(240, 32, 30, 0.1));
 	monkeys.push(spawnRunMonkey(240, 32, 20, 0.05));
+	monkeys.push(spawnRunMonkey(380, 32, 40, 0.2));
+	monkeys.push(spawnRunMonkey(410, 32, 40, 0.15));
 	monkeys.push(spawnJumpMonkey(120, 32, 2));
 	monkeys.push(spawnJumpMonkey(180, 32, 1));
-}
+	monkeys.push(spawnJumpMonkey(321, 32, 1.5));
+	monkeys.push(spawnJumpMonkey(310, 32, 2));
+	monkeys.push(spawnJumpMonkey(405, 32, 1.6));
+};
 
 // --- Island Monkey Game Mode
 
-var nextMoveTime = time;
-var monkeysStageWidth = 500;
-var monkeysBackground = [
-	{
-		x: 30,
-		y: 25,
-		width: 8,
-		sprite: palmTree
-	},
-	{
-		x: 171,
-		y: 25,
-		width: 8,
-		sprite: palmTree
-	},
-	{
-		x: 180,
-		y: 25,
-		width: 8,
-		sprite: palmTree
-	}
-]
+var nextCollisionDetectTime = time;
+var injuryBoxEndTime = time;
 var islandMonkeys = function () {
-	// Get player input
-	var direction = 0;
-	if (keys[37] && keys[39]) {
-		// no-op
-	} else if (keys[37]) {
-		// Move left
-		direction = -1;
-	} else if (keys[39]) {
-		// Move right
-		direction = 1;
-	}
-
-	if (monkeysPlayer.y >= monkeysPlayer.initialY) {
-		if (keys[38]) {
-		// Jump if on ground
-			monkeysPlayer.velocityY = 150;
-		}
-		// Stop down motion if already on ground
-		monkeysPlayer.velocityY = Math.max(0, monkeysPlayer.velocityY);
-  } else {
-		monkeysPlayer.velocityY = monkeysPlayer.velocityY - (frameDelta / 1000) * 500;
-	}
-
-	if (nextMoveTime <= time) {
-		nextMoveTime = time + 40;
-		monkeysPlayer.x = Math.min(Math.max(monkeysPlayer.x + direction, 0), monkeysStageWidth - monkeysPlayer.width);
-		if (monkeysPlayer.x < (monkeysCamera.x + monkeysCamera.marginLeft)) {
-			monkeysCamera.x = Math.max(monkeysCamera.x - 1, 0);
-		} else if (monkeysPlayer.x + 6 > (monkeysCamera.x + width - monkeysCamera.marginRight)) {
-			monkeysCamera.x = Math.min(monkeysStageWidth - width, monkeysCamera.x + 1);
-		}
-		if (monkeysPlayer.velocityY !== 0) {
-			monkeysPlayer.y = Math.min(monkeysPlayer.initialY, Math.floor(monkeysPlayer.y - (monkeysPlayer.velocityY * (frameDelta / 1000))));
-		}
-	}
 
 	// Update world state
+	monkeysPlayer.tick();
+
 	for (var i = 0; i < monkeys.length; i++) {
 		monkeys[i].tick();
 	}
 
+	// Collide player and monkeys every 250ms
+	if (time >= nextCollisionDetectTime) {
+		nextCollisionDetectTime = time + 250;
+		// TODO: Return collision hulls from tick and interpolate any skipped pixels
+		var playerCollisionHull = monkeysPlayer.getSprite().map(function (spriteCoord) {
+			return [monkeysPlayer.x + spriteCoord[0], monkeysPlayer.y + spriteCoord[1]];
+		});
+		for (var i = 0; i < monkeys.length; i++) {
+			var monkeyCollisionHull = monkeys[i].getSprite().map(function (spriteCoord) {
+				return [monkeys[i].x + spriteCoord[0], monkeys[i].y + spriteCoord[1]];
+			});
+			if (monkeyCollisionHull.some(function (monkeyCoord) {
+				return playerCollisionHull.some(function (playerCoord) {
+					return monkeyCoord[0] === playerCoord[0] && monkeyCoord[1] == playerCoord[1];
+				});
+			})) {
+				monkeysPlayer.health = monkeysPlayer.health - 1;
+				injuryBoxEndTime = time + 100;
+				// Exit collision check loop - don't collide more than once per check
+				break;
+			}
+		}
+	}
+
+	if (monkeysPlayer.health <= 0) {
+		goToKillScreen();
+	}
+
+	// Finish stage
 	if (monkeysPlayer.x >= monkeysStageWidth - monkeysPlayer.width) {
 		// To Be Continued
 		gameMode = 6;
 	}
+
+	// Move camera
+	if (monkeysPlayer.x < (monkeysCamera.x + monkeysCamera.marginLeft)) {
+		monkeysCamera.x = Math.max(monkeysCamera.x - 1, 0);
+	} else if (monkeysPlayer.x + monkeysPlayer.width > (monkeysCamera.x + width - monkeysCamera.marginRight)) {
+		monkeysCamera.x = Math.min(monkeysStageWidth - width, monkeysCamera.x + 1);
+	}
+
 	// Render world
 
 	// Draw background objects
@@ -1309,27 +1429,46 @@ var islandMonkeys = function () {
 	}
 
 	// Draw player
-	switch(direction) {
-		case -1:
-			if (Math.floor(time / 100) % 2 === 0) {
-				drawSprite(monkeysPlayer.x - monkeysCamera.x, monkeysPlayer.y, monkeysPlayer.leftSpriteA);
-			} else {
-				drawSprite(monkeysPlayer.x - monkeysCamera.x, monkeysPlayer.y, monkeysPlayer.leftSpriteB);
-			}
-			break;
-		case 1:
-			if (Math.floor(time / 100) % 2 === 0) {
-				drawSprite(monkeysPlayer.x - monkeysCamera.x, monkeysPlayer.y, monkeysPlayer.rightSpriteA);
-			} else {
-				drawSprite(monkeysPlayer.x - monkeysCamera.x, monkeysPlayer.y, monkeysPlayer.rightSpriteB);
-			}
-			break;
-		case 0:
-		default:
-			drawSprite(monkeysPlayer.x - monkeysCamera.x, monkeysPlayer.y, monkeysPlayer.stillSprite);
-			break;
+	drawSprite(monkeysPlayer.x - monkeysCamera.x, monkeysPlayer.y, monkeysPlayer.getSprite());
+
+	// Draw Health
+	var heart1 = heartEmpty;
+	var heart2 = heartEmpty;
+	var heart3 = heartEmpty;
+	if (monkeysPlayer.health >= 1) {
+		heart1 = heartHalf;
 	}
-}
+	if (monkeysPlayer.health >= 2) {
+		heart1 = heartFull;
+	}
+	if (monkeysPlayer.health >= 3) {
+		heart2 = heartHalf;
+	}
+	if (monkeysPlayer.health >= 4) {
+		heart2 = heartFull;
+	}
+	if (monkeysPlayer.health >= 5) {
+		heart3 = heartHalf;
+	}
+	if (monkeysPlayer.health >= 6) {
+		heart3 = heartFull;
+	}
+	drawSprite(82, 1, heart1);
+	drawSprite(88, 1, heart2);
+	drawSprite(94, 1, heart3);
+
+	// Draw injury warning box
+	if (time <= injuryBoxEndTime) {
+		for(var i = 0; i < width; i++) {
+			drawPixel(i, 0, 'ff0000');
+			drawPixel(i, height - 1, 'ff0000');
+		}
+		for(var i = 1; i < height - 1; i++) {
+			drawPixel(0, i, 'ff0000');
+			drawPixel(width - 1, i, 'ff0000');
+		}
+	}
+};
 
 // --- To be continued screen for WIP stages
 var toBeContinued = function () {
@@ -1337,7 +1476,7 @@ var toBeContinued = function () {
 	var k = 0;
 	for (var i = 2; i < width - 2; i += 8) {
 		for (var j = 0; j < height; j += 8) {
-			drawSkull(i, j, colors[(Math.floor(time / 100) + ++k) % colors.length])
+			drawSkull(i, j, colors[(Math.floor(time / 100) + ++k) % colors.length]);
 		}
 	}
 	for(var i = 19; i < 80; i++) {
@@ -1346,8 +1485,7 @@ var toBeContinued = function () {
 		}
 	}
 	drawText(20, 14, 'TO BE CONTINUED', hotPink);
-
-}
+};
 
 var gameLoop = function () {
 
@@ -1355,7 +1493,7 @@ var gameLoop = function () {
 	time = performance.now();
 	frameDelta = time  - lastTime;
 	lastTime = time;
-	frameRandom = Math.random()
+	frameRandom = Math.random();
 
 	// Clear Canvas
 	ctx.fillStyle = '#' + skyBlue;
@@ -1424,24 +1562,28 @@ var gameLoop = function () {
 
 	// Loop
 	window.requestAnimationFrame(gameLoop);
-}
+};
 
 var handleKeyDown = function (event) {
 	keys[event.keyCode] = true;
-}
+	// Disable our game keys from moving the page around etc
+	if ([27,13,37,38,39,40].indexOf(event.keyCode) >=0) {
+		event.preventDefault();
+	}
+};
 
-var konami = [38,38,40,40,37,39,37,39,66,65]
-var codeEntered = []
+var konamiSequence = [38,38,40,40,37,39,37,39,66,65];
+var codeEntered = [];
 var handleKeyUp = function (event) {
 	delete keys[event.keyCode];
 
 	// Cheat Code
 	if (gameMode === 0) {
-		if (konami[codeEntered.length] === event.keyCode) {
+		if (konamiSequence[codeEntered.length] === event.keyCode) {
 			codeEntered.push(event.keyCode);
-			if (codeEntered.length === konami.length) {
+			if (codeEntered.length === konamiSequence.length) {
 				for (var i = 0; i < codeEntered.length; i++) {
-					if (codeEntered[i] !== konami[i]) {
+					if (codeEntered[i] !== konamiSequence[i]) {
 						return;
 					}
 				}
@@ -1452,7 +1594,7 @@ var handleKeyUp = function (event) {
 			codeEntered = [];
 		}
 	}
-}
+};
 
 window.addEventListener('keydown', handleKeyDown, true);
 window.addEventListener('keyup', handleKeyUp, true);
