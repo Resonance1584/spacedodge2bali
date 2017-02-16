@@ -437,7 +437,7 @@ var konami = false;
 // Starts the game
 var startGame = function () {
 	startTime = time;
-	gameMode = konami ? 4 : 1;
+	gameMode = 1;
 	keys = {};
 };
 
@@ -1502,7 +1502,11 @@ var gameLoop = function () {
 	if (gameMode === 0) {
 		deadDelta = time - deadTime;
 		if (deadDelta > 500 && keys[13]) {
-			startGame();
+			if (konami) {
+				goToIslandDialogue();
+			} else {
+				startGame();
+			}
 		}
 		var k = deadDelta < 1000 ? Math.floor(deadDelta * (8 / 1000)) : 8;
 		drawText(24, k, 'SPACEDODGE II:', 'fb3494');
