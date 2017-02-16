@@ -1035,14 +1035,21 @@ var monkeysPlayer = {
 			monkeysPlayer.velocityY = monkeysPlayer.velocityY - (frameDelta / 1000) * 500;
 		}
 
+		var collisionHull = this.getSprite().map((coord) => {
+			return [
+				this.x + coord[0], this.y + coord[1]
+			];
+		});
+
 		if (this.nextMoveTime <= time) {
 			this.nextMoveTime = time + 40;
 			monkeysPlayer.x = Math.min(Math.max(monkeysPlayer.x + this.direction, 0), monkeysStageWidth - monkeysPlayer.width);
-			console.log(monkeysPlayer.x);
 			if (monkeysPlayer.velocityY !== 0) {
 				monkeysPlayer.y = Math.min(monkeysPlayer.initialY, Math.floor(monkeysPlayer.y - (monkeysPlayer.velocityY * (frameDelta / 1000))));
 			}
 		}
+
+		return collisionHull;
 	},
 	getSprite: function () {
 		switch(this.direction) {
@@ -1183,7 +1190,27 @@ var spawnJumpMonkey = function (x, y, secondsBetweenJumps) {
 				this.velocityY = this.velocityY - (frameDelta / 1000) * 400;
 			}
 
+			var oldY = this.y;
 			this.y = Math.min(this.initialY, Math.floor(this.y - (this.velocityY * (frameDelta / 1000))));
+
+			var collisionHull = this.getSprite().map((coord) => {
+				return [
+					this.x + coord[0], this.y + coord[1]
+				];
+			})
+			if (oldY !== this.y) {
+				var i = oldY;
+				while (i !== this.y) {
+					i += this.y > i ? 1 : -1;
+					collisionHull = collisionHull.concat(this.getSprite().map((coord) => {
+						return [
+							this.x + coord[0], i + coord[1]
+						];
+					}));
+				}
+			}
+
+			return collisionHull;
 		}
 	};
 };
@@ -1202,8 +1229,15 @@ var spawnRunMonkey = function (x, y, runDistance, secondsBetweenMoves) {
 		nextMoveTime: time + Math.random() * secondsBetweenMoves * 1000,
 		moveInterval: secondsBetweenMoves * 1000,
 		tick: function () {
+			var collisionHull = this.getSprite().map((coord) => {
+				return [
+					this.x + coord[0], this.y + coord[1]
+				];
+			});
+
 			if (time >= this.nextMoveTime) {
 				this.nextMoveTime = time + this.moveInterval;
+				var oldX = this.x;
 				if (this.facingLeft) {
 					this.x = this.x - 1;
 				} else {
@@ -1358,33 +1392,23 @@ var injuryBoxEndTime = time;
 var islandMonkeys = function () {
 
 	// Update world state
-	monkeysPlayer.tick();
+	var playerCollisionHull = monkeysPlayer.tick();
 
+	var monkeyCollisionHulls = []
 	for (var i = 0; i < monkeys.length; i++) {
-		monkeys[i].tick();
+		monkeyCollisionHulls = monkeyCollisionHulls.concat(monkeys[i].tick());
 	}
 
 	// Collide player and monkeys every 250ms
 	if (time >= nextCollisionDetectTime) {
-		nextCollisionDetectTime = time + 250;
-		// TODO: Return collision hulls from tick and interpolate any skipped pixels
-		var playerCollisionHull = monkeysPlayer.getSprite().map(function (spriteCoord) {
-			return [monkeysPlayer.x + spriteCoord[0], monkeysPlayer.y + spriteCoord[1]];
-		});
-		for (var i = 0; i < monkeys.length; i++) {
-			var monkeyCollisionHull = monkeys[i].getSprite().map(function (spriteCoord) {
-				return [monkeys[i].x + spriteCoord[0], monkeys[i].y + spriteCoord[1]];
+		if (monkeyCollisionHulls.some(function (monkeyCoord) {
+			return playerCollisionHull.some(function (playerCoord) {
+				return monkeyCoord[0] === playerCoord[0] && monkeyCoord[1] == playerCoord[1];
 			});
-			if (monkeyCollisionHull.some(function (monkeyCoord) {
-				return playerCollisionHull.some(function (playerCoord) {
-					return monkeyCoord[0] === playerCoord[0] && monkeyCoord[1] == playerCoord[1];
-				});
-			})) {
-				monkeysPlayer.health = monkeysPlayer.health - 1;
-				injuryBoxEndTime = time + 100;
-				// Exit collision check loop - don't collide more than once per check
-				break;
-			}
+		})) {
+			monkeysPlayer.health = monkeysPlayer.health - 1;
+			nextCollisionDetectTime = time + 250;
+			injuryBoxEndTime = time + 100;
 		}
 	}
 
